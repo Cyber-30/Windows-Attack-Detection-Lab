@@ -142,20 +142,42 @@ Windows-Attack-Detection-Lab/
 ├── notes/
 │   └── incident-writeup.md
 │
-├── screenshots/
-│   ├── 01-nmap-scan-output.png
-│   ├── 02-eventid3-filtered-log.png
-│   ├── 03-eventid3-detail-view.png
-│   ├── 04-hydra-bruteforce-run.png
-│   ├── 05-eventid4625-cluster.png
-│   └── 06-eventid4740-lockout.png
-│
-├── configs/
-│   └── sysmonconfig-export.xml
-│
-└── wordlist/
-    └── passwords.txt
+└── screenshots/
+    ├── README.md
+    ├── 01-sysmon-install-confirmation.png
+    ├── 02-sysmon-baseline-verification.png
+    ├── 03-nmap-portscan-output.png
+    ├── 04-eventid3-filtered-list.png
+    ├── 05-eventid3-general-tab.png
+    ├── 06-eventid3-details-friendly-view.png
+    ├── 07-eventid3-details-xml-view.png
+    ├── 08-smb-protocol-check.png
+    ├── 09-hydra-bruteforce-run.png
+    ├── 10-eventid4625-xml-detail.png
+    ├── 11-eventid4740-lockout-general.png
+    ├── 12-security-log-filtered-list.png
+    └── description.md
 ```
+---
+
+# ⚙️ Configuration & Wordlist Details
+
+### Sysmon Configuration
+
+Based on the [SwiftOnSecurity sysmon-config](https://github.com/SwiftOnSecurity/sysmon-config) baseline. The default config excludes network connection logging for common system processes (`System`, `svchost.exe`) to reduce noise in production environments. Since this lab's target ports (135, 139, 445) are handled by exactly those processes, a scoped `NetworkConnect` include rule was added for the lab subnet:
+
+```xml
+<RuleGroup name="" groupRelation="or">
+  <NetworkConnect onmatch="include">
+    <SourceIp condition="is">192.168.56.1</SourceIp>
+    <DestinationIp condition="is">192.168.56.101</DestinationIp>
+  </NetworkConnect>
+</RuleGroup>
+```
+
+### Wordlist
+
+A small custom dictionary was used for the brute-force test, containing common weak passwords (`password`, `123456`, `admin`, `letmein`) plus the actual test account's password, to generate both failed (Event ID 4625) and — when unlocked and re-run — successful (Event ID 4624) logon telemetry for comparison.
 
 ---
 
